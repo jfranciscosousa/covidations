@@ -79,7 +79,7 @@
 						Ver dados do dia seguinte
 					</a>
 
-					<a href={data.nextLink} class="underline" on:click={handleNavigation("/")}>
+					<a href="/" class="underline" on:click={handleNavigation("/")}>
 						Ver dados de hoje
 					</a>
 				{/if}
