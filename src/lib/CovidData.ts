@@ -1,12 +1,16 @@
 export class CovidData {
 	private prevData: Record<string, string>;
-	private data: Record<string, string>;
-	date: Date;
+	private currData: Record<string, string>;
+	currentDate: Date;
+	previousDate: Date;
+	latestDate: Date;
 
-	constructor(prevData: Record<string, string>, data: Record<string, string>, date: string) {
-		this.data = data;
-		this.prevData = prevData;
-		this.date = new Date(date);
+	constructor(data: any) {
+		this.currData = data.currData;
+		this.prevData = data.prevData;
+		this.currentDate = new Date(data.currentDate);
+		this.previousDate = new Date(data.previousDate);
+		this.latestDate = new Date(data.latestDate);
 	}
 
 	private getValue(dataObj, key) {
@@ -16,45 +20,59 @@ export class CovidData {
 	}
 
 	get cases(): number {
-		return Number(this.getValue(this.data, 'confirmados'));
+		return Number(this.getValue(this.currData, "confirmados"));
 	}
 
 	get newCases(): number {
 		return (
-			Number(this.getValue(this.data, 'confirmados')) -
-			Number(this.getValue(this.prevData, 'confirmados'))
+			Number(this.getValue(this.currData, "confirmados")) -
+			Number(this.getValue(this.prevData, "confirmados"))
 		);
 	}
 
 	get deaths(): number {
-		return Number(this.getValue(this.data, 'obitos'));
+		return Number(this.getValue(this.currData, "obitos"));
 	}
 
 	get newDeaths(): number {
 		return (
-			Number(this.getValue(this.data, 'obitos')) - Number(this.getValue(this.prevData, 'obitos'))
+			Number(this.getValue(this.currData, "obitos")) -
+			Number(this.getValue(this.prevData, "obitos"))
 		);
 	}
 
 	get hospitalized(): number {
-		return Number(this.getValue(this.data, 'internados'));
+		return Number(this.getValue(this.currData, "internados"));
 	}
 
 	get newHospitalized(): number {
 		return (
-			Number(this.getValue(this.data, 'internados')) -
-			Number(this.getValue(this.prevData, 'internados'))
+			Number(this.getValue(this.currData, "internados")) -
+			Number(this.getValue(this.prevData, "internados"))
 		);
 	}
 
 	get uci(): number {
-		return Number(this.getValue(this.data, 'internados_uci'));
+		return Number(this.getValue(this.currData, "internados_uci"));
 	}
 
 	get newUci(): number {
 		return (
-			Number(this.getValue(this.data, 'internados_uci')) -
-			Number(this.getValue(this.prevData, 'internados_uci'))
+			Number(this.getValue(this.currData, "internados_uci")) -
+			Number(this.getValue(this.prevData, "internados_uci"))
 		);
+	}
+
+	get previousLink(): string {
+		return `/?date=${this.previousDate.toLocaleDateString()}`;
+	}
+
+	get nextLink(): string | null {
+		const nextDay = new Date(this.currentDate);
+		nextDay.setDate(this.currentDate.getDate() + 1);
+
+		if (this.latestDate.toLocaleDateString() === this.currentDate.toLocaleDateString()) return null;
+
+		return `/?date=${nextDay.toLocaleDateString()}`;
 	}
 }

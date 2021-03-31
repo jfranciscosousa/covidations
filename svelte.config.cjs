@@ -1,6 +1,6 @@
-const sveltePreprocess = require('svelte-preprocess');
-const buildAdapter = require('@sveltejs/adapter-netlify');
-const pkg = require('./package.json');
+const sveltePreprocess = require("svelte-preprocess");
+const buildAdapter = require("@sveltejs/adapter-netlify");
+const pkg = require("./package.json");
 
 /** @type {import('@sveltejs/kit').Config} */
 module.exports = {
@@ -9,7 +9,7 @@ module.exports = {
 	preprocess: [
 		sveltePreprocess({
 			defaults: {
-				style: 'postcss'
+				style: "postcss"
 			},
 			postcss: true
 		})
@@ -18,13 +18,9 @@ module.exports = {
 		adapter: buildAdapter(),
 
 		// hydrate the <div id="svelte"> element in src/app.html
-		target: '#svelte',
+		target: "#svelte",
 
 		vite: {
-			optimizeDeps: {
-				include: ['axios']
-			},
-
 			ssr: {
 				// Remove any non-ES package from Vite optimizations
 				noExternal: Object.keys(pkg.dependencies || {})
