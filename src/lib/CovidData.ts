@@ -1,3 +1,5 @@
+import { format } from "date-fns";
+
 export class CovidData {
 	private prevData: Record<string, string>;
 	private currData: Record<string, string>;
@@ -64,7 +66,7 @@ export class CovidData {
 	}
 
 	get previousLink(): string {
-		return `/?date=${this.previousDate.toLocaleDateString()}`;
+		return `/?date=${format(this.previousDate, "yyyy-MM-dd")}`;
 	}
 
 	get nextLink(): string | null {
@@ -73,6 +75,6 @@ export class CovidData {
 
 		if (this.latestDate.toLocaleDateString() === this.currentDate.toLocaleDateString()) return null;
 
-		return `/?date=${nextDay.toLocaleDateString()}`;
+		return `/?date=${format(nextDay, "yyyy-MM-dd")}`;
 	}
 }
