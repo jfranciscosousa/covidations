@@ -51,7 +51,7 @@
 </script>
 
 <main class="max-w-5xl mx-auto py-12 text-white px-6">
-	<h1 class="text-4xl mb-4">Portugal Covid Summary</h1>
+	<h1 class="text-3xl mb-4">Ponto situação COVID em Portugal</h1>
 
 	{#if loading}
 		loading
@@ -70,16 +70,22 @@
 					href={data.previousLink}
 					class="underline"
 					on:click={handleNavigation(data.previousLink)}
+					sveltekit:prefetch
 				>
 					Ver dados do dia anterior
 				</a>
 
 				{#if data.nextLink}
-					<a href={data.nextLink} class="underline" on:click={handleNavigation(data.nextLink)}>
+					<a
+						href={data.nextLink}
+						class="underline"
+						on:click={handleNavigation(data.nextLink)}
+						sveltekit:prefetch
+					>
 						Ver dados do dia seguinte
 					</a>
 
-					<a href="/" class="underline" on:click={handleNavigation("/")}>
+					<a href="/" class="underline" on:click={handleNavigation('/')} sveltekit:prefetch>
 						Ver dados de hoje
 					</a>
 				{/if}
