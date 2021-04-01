@@ -2,7 +2,7 @@ import { format, parse, sub, isValid } from "date-fns";
 import fetch from "node-fetch";
 import type { Request, Response } from "@sveltejs/kit";
 
-async function getLatestAvailableDate(){
+async function getLatestAvailableDate() {
 	const latestDateRes = await fetch("https://covid19-api.vost.pt/Requests/get_last_update");
 
 	if (!latestDateRes.ok) throw "API Error";
@@ -32,17 +32,14 @@ function formatDateToApi(date) {
 }
 
 async function getData(previousDate, currentDate) {
-	const currentRes = await fetch(
-		`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`
-	);
-	const prevRes = await fetch(
-		`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`
-	);
+	const [currentRes, prevRes] = await Promise.all([
+		fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`),
+		fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`)
+	]);
 
 	if (!currentRes.ok || !prevRes.ok) throw "API Error";
 
-	const prevData = await prevRes.json();
-	const currData = await currentRes.json();
+	const [prevData, currData] = await Promise.all([prevRes.json(), currentRes.json()]);
 
 	return { prevData, currData };
 }

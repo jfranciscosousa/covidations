@@ -35,6 +35,10 @@
 		return async (event) => {
 			event.preventDefault();
 
+			// This code looks a bit convuluted
+			// but it's to basically artificially delay
+			// all requests by 500ms to give a nice
+			// transition
 			const delay = () =>
 				setTimeout(() => {
 					if (navigated) loading = false;
