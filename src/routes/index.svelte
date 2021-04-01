@@ -50,7 +50,7 @@
 	}
 </script>
 
-<main class="max-w-4xl mx-auto py-12 text-white px-6">
+<main class="max-w-5xl mx-auto py-12 text-white px-6">
 	<h1 class="text-4xl mb-4">Portugal Covid Summary</h1>
 
 	{#if loading}
