@@ -77,4 +77,22 @@ export class CovidData {
 
 		return `/?date=${format(nextDay, "yyyy-MM-dd")}`;
 	}
+
+	toJSON(): DailyCovidData {
+		return {
+			currentDate: this.currentDate.toISOString(),
+			previousDate: this.previousDate.toISOString(),
+			latestDate: this.latestDate.toISOString(),
+			cases: this.cases,
+			newCases: this.newCases,
+			deaths: this.newDeaths,
+			newDeaths: this.newDeaths,
+			hospitalized: this.hospitalized,
+			newHospitalized: this.newHospitalized,
+			uci: this.uci,
+			newUci: this.newUci,
+			previousLink: this.previousLink,
+			nextLink: this.nextLink
+		};
+	}
 }

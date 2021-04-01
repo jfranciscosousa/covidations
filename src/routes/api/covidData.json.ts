@@ -1,6 +1,7 @@
 import { format, parse, sub, isValid } from "date-fns";
 import fetch from "node-fetch";
 import type { Request, Response } from "@sveltejs/kit";
+import { CovidData } from "$lib/CovidData";
 
 async function getLatestAvailableDate() {
 	const latestDateRes = await fetch("https://covid19-api.vost.pt/Requests/get_last_update");
@@ -51,7 +52,7 @@ export async function get({ query }: Request): Promise<Response> {
 	const data = await getData(previousDate, currentDate);
 
 	return {
-		body: { ...data, previousDate, currentDate, latestDate },
+		body: new CovidData({ ...data, previousDate, currentDate, latestDate }).toJSON(),
 		headers: {
 			"cache-control": "public, max-age=3600"
 		}

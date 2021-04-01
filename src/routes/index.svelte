@@ -1,12 +1,11 @@
 <script lang="ts" context="module">
-	import { CovidData } from '$lib/CovidData';
-	import type { LoadInput, LoadOutput } from '@sveltejs/kit/types.internal';
+	import type { LoadInput, LoadOutput } from "@sveltejs/kit/types.internal";
 
 	export async function load({ fetch, page }: LoadInput): Promise<LoadOutput> {
-		const date = page.query.get('date');
-		const url = date ? `/api/covidData.json?date=${date}` : '/api/covidData.json';
+		const date = page.query.get("date");
+		const url = date ? `/api/covidData.json?date=${date}` : "/api/covidData.json";
 		const res = ((await fetch(url, {
-			credentials: 'omit'
+			credentials: "omit"
 		})) as unknown) as Response;
 
 		if (res.ok) {
@@ -14,7 +13,7 @@
 
 			return {
 				props: {
-					data: await new CovidData(data)
+					data
 				},
 				maxage: 3600
 			};
@@ -23,11 +22,11 @@
 </script>
 
 <script lang="ts">
-	import { goto } from '$app/navigation';
-	import { fade } from 'svelte/transition';
-	import StatCard from '$lib/StatCard.svelte';
+	import { goto } from "$app/navigation";
+	import { fade } from "svelte/transition";
+	import StatCard from "$lib/StatCard.svelte";
 
-	export let data: CovidData;
+	export let data: DailyCovidData;
 
 	let loading = false;
 
@@ -62,10 +61,10 @@
 	{:else}
 		<div in:fade>
 			<p class="mb-2">
-				{data.currentDate.toLocaleString(undefined, {
-					month: 'long',
-					day: 'numeric',
-					year: 'numeric'
+				{new Date(data.currentDate).toLocaleString("pt-pt", {
+					month: "long",
+					day: "numeric",
+					year: "numeric"
 				})}
 			</p>
 
@@ -89,7 +88,7 @@
 						Ver dados do dia seguinte
 					</a>
 
-					<a href="/" class="underline" on:click={handleNavigation('/')} sveltekit:prefetch>
+					<a href="/" class="underline" on:click={handleNavigation("/")} sveltekit:prefetch>
 						Ver dados de hoje
 					</a>
 				{/if}
@@ -114,6 +113,6 @@
 
 <style>
 	.grid {
-		grid-template-columns: repeat(auto-fit, minmax(theme('width.56'), 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(theme("width.56"), 1fr));
 	}
 </style>
