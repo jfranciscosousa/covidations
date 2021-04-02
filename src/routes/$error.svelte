@@ -1,8 +1,18 @@
 <script>
 	export let status;
-	export let error;
+  export let error;
+
+	$: console.log(status, error);
 </script>
 
-<div class="h-full flex flex-col justify-center">
-  <h1>Erro grave, não conseguimos processar</h1>
+<div class="h-full flex flex-col items-center text-center max-w-md mx-auto">
+	<p class="text-xl mt-48">
+		{#if status === 404}
+			Não conseguimos encontrar a página que pretende
+		{:else}
+			Erro grave, não conseguimos processar este pedido. Por favor tente mais tarde
+		{/if}
+	</p>
+
+	<a class="block text-lg mt-8 underline" href="/">Voltar à pagina principal</a>
 </div>

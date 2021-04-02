@@ -3,8 +3,7 @@ import type { Handle } from "@sveltejs/kit";
 /**
  * Replace all max-age cache controls with s-maxage
  */
-
-const handle: Handle = async (request, render) => {
+export const handle: Handle = async (request, render) => {
 	const response = await render(request);
 	const cacheControlHeader = response.headers["cache-control"];
 
@@ -19,5 +18,3 @@ const handle: Handle = async (request, render) => {
 		}
 	};
 };
-
-export { handle };
