@@ -5,16 +5,16 @@ import type { Handle } from "@sveltejs/kit";
  */
 export const handle: Handle = async (request, render) => {
 	const response = await render(request);
-	const cacheControlHeader = response.headers["cache-control"];
+
+	if (!response) return response;
+
+	const cacheControlHeader = response?.headers?.["cache-control"];
 
 	if (cacheControlHeader) {
 		response.headers["cache-control"] = cacheControlHeader.replace("max-age", "s-maxage");
 	}
 
 	return {
-		...response,
-		headers: {
-			...response.headers
-		}
+		...response
 	};
 };
