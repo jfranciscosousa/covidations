@@ -85,7 +85,7 @@ export class CovidData {
       latestDate: this.latestDate.toISOString(),
       cases: this.cases,
       newCases: this.newCases,
-      deaths: this.newDeaths,
+      deaths: this.deaths,
       newDeaths: this.newDeaths,
       hospitalized: this.hospitalized,
       newHospitalized: this.newHospitalized,

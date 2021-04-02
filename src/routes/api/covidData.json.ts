@@ -54,7 +54,7 @@ export async function get({ query }: Request): Promise<Response> {
   return {
     body: new CovidData({ ...data, previousDate, currentDate, latestDate }).toJSON(),
     headers: {
-      "cache-control": "public, max-age=3600"
+      "cache-control": "public, s-maxage=3600"
     }
   };
 }
