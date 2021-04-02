@@ -8,9 +8,9 @@
 <div class="h-full flex flex-col items-center text-center max-w-md mx-auto">
 	<p class="text-xl mt-48">
 		{#if status === 404}
-			Não conseguimos encontrar a página que pretende
+			Não conseguimos encontrar a página que pretende.
 		{:else}
-			Erro grave, não conseguimos processar este pedido. Por favor tente mais tarde
+			Erro grave, não conseguimos processar este pedido. Por favor tente mais tarde.
 		{/if}
 	</p>
 

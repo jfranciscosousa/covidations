@@ -4,9 +4,7 @@
 	export const load: Load = async ({ fetch, page }) => {
 		const date = page.query.get("date");
 		const url = date ? `/api/covidData.json?date=${date}` : "/api/covidData.json";
-		const res = ((await fetch(url, {
-			credentials: "omit"
-		})) as unknown) as Response;
+		const res: Response = await fetch(url, {credentials: "omit"}) as never;
 
 		if (res.ok) {
 			const data = await res.json();
