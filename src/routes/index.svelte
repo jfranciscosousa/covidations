@@ -4,7 +4,7 @@
 	export const load: Load = async ({ fetch, page }) => {
 		const date = page.query.get("date");
 		const url = date ? `/api/covidData.json?date=${date}` : "/api/covidData.json";
-		const res: Response = await fetch(url, {credentials: "omit"}) as never;
+		const res: Response = (await fetch(url, { credentials: "omit" })) as never;
 
 		if (res.ok) {
 			const data = await res.json();
@@ -67,7 +67,7 @@
 			})}
 		</p>
 
-		<div class="flex flex-col space-y-2 mb-8 sm:space-x-4 sm:space-y-0 sm:flex-row">
+		<div class="flex flex-col space-y-2 mb-8 sm:space-x-4 sm:flex-row">
 			<a
 				href={data.previousLink}
 				class="underline"

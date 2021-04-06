@@ -8,10 +8,10 @@ interface DailyCovidData {
   latestDate: string;
   cases: number;
   newCases: number;
-  deaths:number;
-  newDeaths:number;
+  deaths: number;
+  newDeaths: number;
   hospitalized: number;
-  newHospitalized:number;
+  newHospitalized: number;
   uci: number;
   newUci: number;
   previousLink: string;

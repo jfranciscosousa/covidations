@@ -4,57 +4,57 @@ import type { Request, Response } from "@sveltejs/kit";
 import { CovidData } from "$lib/CovidData";
 
 async function getLatestAvailableDate() {
-	const latestDateRes = await fetch("https://covid19-api.vost.pt/Requests/get_last_update");
+  const latestDateRes = await fetch("https://covid19-api.vost.pt/Requests/get_last_update");
 
-	if (!latestDateRes.ok) throw "API Error";
+  if (!latestDateRes.ok) throw "API Error";
 
-	const latestDate = (await latestDateRes.json()).data;
-	const parsedLatestDate = parse(latestDate, "dd-MM-yyyy", new Date());
+  const latestDate = (await latestDateRes.json()).data;
+  const parsedLatestDate = parse(latestDate, "dd-MM-yyyy", new Date());
 
-	return parsedLatestDate;
+  return parsedLatestDate;
 }
 
 function getCurrentDate(desiredDate, fallbackDate) {
-	if (!desiredDate) return fallbackDate;
+  if (!desiredDate) return fallbackDate;
 
-	const dateFromQuery = new Date(desiredDate);
+  const dateFromQuery = new Date(desiredDate);
 
-	if (!isValid(dateFromQuery)) throw "Invalid Date";
+  if (!isValid(dateFromQuery)) throw "Invalid Date";
 
-	return dateFromQuery;
+  return dateFromQuery;
 }
 
 function getPreviousDate(currentDate) {
-	return sub(currentDate, { days: 1 });
+  return sub(currentDate, { days: 1 });
 }
 
 function formatDateToApi(date) {
-	return format(date, "dd-MM-yyyy");
+  return format(date, "dd-MM-yyyy");
 }
 
 async function getData(previousDate, currentDate) {
-	const [currentRes, prevRes] = await Promise.all([
-		fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`),
-		fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`)
-	]);
+  const [currentRes, prevRes] = await Promise.all([
+    fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`),
+    fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`)
+  ]);
 
-	if (!currentRes.ok || !prevRes.ok) throw "API Error";
+  if (!currentRes.ok || !prevRes.ok) throw "API Error";
 
-	const [prevData, currData] = await Promise.all([prevRes.json(), currentRes.json()]);
+  const [prevData, currData] = await Promise.all([prevRes.json(), currentRes.json()]);
 
-	return { prevData, currData };
+  return { prevData, currData };
 }
 
 export async function get({ query }: Request): Promise<Response> {
-	const latestDate = await getLatestAvailableDate();
-	const currentDate = getCurrentDate(query.get("date"), latestDate);
-	const previousDate = getPreviousDate(currentDate);
-	const data = await getData(previousDate, currentDate);
+  const latestDate = await getLatestAvailableDate();
+  const currentDate = getCurrentDate(query.get("date"), latestDate);
+  const previousDate = getPreviousDate(currentDate);
+  const data = await getData(previousDate, currentDate);
 
-	return {
-		body: new CovidData({ ...data, previousDate, currentDate, latestDate }).toJSON(),
-		headers: {
-			"cache-control": "public, s-maxage=3600"
-		}
-	};
+  return {
+    body: new CovidData({ ...data, previousDate, currentDate, latestDate }).toJSON(),
+    headers: {
+      "cache-control": "public, s-maxage=3600"
+    }
+  };
 }
