@@ -27,6 +27,7 @@
   import { goto } from "$app/navigation";
   import { fade } from "svelte/transition";
   import StatCard from "$lib/StatCard.svelte";
+  import LoadingSpinner from "$lib/LoadingSpinner.svelte";
 
   export let data: DailyCovidData;
 
@@ -56,7 +57,7 @@
 </script>
 
 {#if loading}
-  loading
+  <LoadingSpinner />
 {:else}
   <div in:fade>
     <p class="mb-4">
