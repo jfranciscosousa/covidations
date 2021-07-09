@@ -3,15 +3,20 @@
 
   export const load: Load = async ({ fetch, page }) => {
     const date = page.query.get("date");
-    const url = date ? `/api/covidData.json?date=${date}` : "/api/covidData.json";
+    const url = date ? `/api/dailyCovidData.json?date=${date}` : "/api/dailyCovidData.json";
     const res: Response = (await fetch(url, { credentials: "omit" })) as never;
+    const timelineRes: Response = (await fetch("/api/historicalCovidData.json", {
+      credentials: "omit"
+    })) as never;
 
     if (res.ok) {
       const data = await res.json();
+      const timelineData = await timelineRes.json();
 
       return {
         props: {
-          data
+          data,
+          timelineData
         },
         maxage: 3600
       };
@@ -24,14 +29,20 @@
 </script>
 
 <script lang="ts">
+  import format from "date-fns/format";
+  import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import { fade } from "svelte/transition";
   import StatCard from "$lib/StatCard.svelte";
   import LoadingSpinner from "$lib/LoadingSpinner.svelte";
+  import Chart from "$lib/Chart.svelte";
 
   export let data: DailyCovidData;
+  export let timelineData;
 
   let loading = false;
+  let startDate = format(new Date("02/26/2020"), "yyyy-MM-dd");
+  let endDate = format(new Date(), "yyyy-MM-dd");
 
   function handleNavigation(url) {
     return async (event) => {
@@ -53,6 +64,20 @@
       await goto(url);
       navigated = true;
     };
+  }
+
+  async function refetch(startDate, endDate) {
+    try {
+      timelineData = await (
+        await fetch(`/api/historicalCovidData.json?start=${startDate}&end=${endDate}`)
+      ).json();
+    } catch (error) {
+      // ignore error and keep original state
+    }
+  }
+
+  $: {
+    if (browser) refetch(startDate, endDate);
   }
 </script>
 
@@ -106,6 +131,78 @@
       />
 
       <StatCard title="Cuidados Intensivos" statCount={data.uci} newStatCount={data.newUci} />
+    </div>
+
+    <div class="mt-10">
+      <div class="flex flex-row space-x-8 text-color mb-8">
+        <label>
+          Start Date
+          <input type="date" bind:value={startDate} class="text-black rounded" />
+        </label>
+
+        <label>
+          End Date
+          <input type="date" bind:value={endDate} class="text-black rounded" />
+        </label>
+      </div>
+
+      <Chart
+        config={{
+          type: "line",
+          options: {
+            plugins: {
+              legend: {
+                display: true,
+                labels: {
+                  color: "white"
+                }
+              },
+              tooltip: {
+                enabled: true
+              }
+            },
+            scales: {
+              x: {
+                grid: {
+                  display: false,
+                  borderColor: "white"
+                },
+                ticks: {
+                  color: "white",
+                  autoSkipPadding: 30
+                }
+              },
+              y: {
+                grid: {
+                  display: false,
+                  borderColor: "white"
+                },
+                ticks: {
+                  color: "white"
+                }
+              }
+            }
+          },
+          data: {
+            labels: timelineData.dates.map((date) =>
+              new Date(date).toLocaleDateString("pt", {
+                day: "numeric",
+                month: "short",
+                year: "numeric"
+              })
+            ),
+            datasets: [
+              {
+                label: "New cases",
+                data: timelineData.cases,
+                fill: false,
+                borderColor: "white",
+                tension: 1
+              }
+            ]
+          }
+        }}
+      />
     </div>
   </div>
 {/if}

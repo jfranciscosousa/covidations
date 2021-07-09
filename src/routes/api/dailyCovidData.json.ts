@@ -1,7 +1,9 @@
-import { format, parse, sub, isValid } from "date-fns";
+import { parse, sub, isValid } from "date-fns";
 import fetch from "node-fetch";
 import type { Request, Response } from "@sveltejs/kit";
 import { CovidData } from "$lib/CovidData";
+import { formatDateToApi } from "./_helpers";
+import type { StrictBody } from "@sveltejs/kit/types/hooks";
 
 async function getLatestAvailableDate() {
   const latestDateRes = await fetch("https://covid19-api.vost.pt/Requests/get_last_update");
@@ -28,10 +30,6 @@ function getPreviousDate(currentDate) {
   return sub(currentDate, { days: 1 });
 }
 
-function formatDateToApi(date) {
-  return format(date, "dd-MM-yyyy");
-}
-
 async function getData(previousDate, currentDate) {
   const [currentRes, prevRes] = await Promise.all([
     fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`),
@@ -52,7 +50,13 @@ export async function get({ query }: Request): Promise<Response> {
   const data = await getData(previousDate, currentDate);
 
   return {
-    body: new CovidData({ ...data, previousDate, currentDate, latestDate }).toJSON(),
+    status: 200,
+    body: new CovidData({
+      ...data,
+      previousDate,
+      currentDate,
+      latestDate
+    }).toJSON() as unknown as StrictBody,
     headers: {
       "cache-control": "public, s-maxage=3600"
     }
