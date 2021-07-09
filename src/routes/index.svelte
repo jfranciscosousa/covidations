@@ -29,7 +29,7 @@
 </script>
 
 <script lang="ts">
-  import format from "date-fns/format";
+  import { format } from "date-fns";
   import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import { fade } from "svelte/transition";

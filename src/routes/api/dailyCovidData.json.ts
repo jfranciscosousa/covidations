@@ -1,20 +1,9 @@
-import { parse, sub, isValid } from "date-fns";
+import { sub, isValid } from "date-fns";
 import fetch from "node-fetch";
 import type { Request, Response } from "@sveltejs/kit";
 import { CovidData } from "$lib/CovidData";
-import { formatDateToApi } from "./_helpers";
+import { formatDateToApi, getLatestAvailableDate } from "./_helpers";
 import type { StrictBody } from "@sveltejs/kit/types/hooks";
-
-async function getLatestAvailableDate() {
-  const latestDateRes = await fetch("https://covid19-api.vost.pt/Requests/get_last_update");
-
-  if (!latestDateRes.ok) throw "API Error";
-
-  const latestDate = (await latestDateRes.json()).data;
-  const parsedLatestDate = parse(latestDate, "dd-MM-yyyy", new Date());
-
-  return parsedLatestDate;
-}
 
 function getCurrentDate(desiredDate, fallbackDate) {
   if (!desiredDate) return fallbackDate;

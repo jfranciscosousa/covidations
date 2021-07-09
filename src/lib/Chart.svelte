@@ -1,15 +1,4 @@
 <script lang="ts">
-  import {
-    Chart,
-    LineController,
-    LinearScale,
-    CategoryScale,
-    PointElement,
-    LineElement,
-    Legend,
-    Tooltip,
-    LogarithmicScale
-  } from "chart.js";
   import type { ChartConfiguration } from "chart.js";
 
   import { onMount, onDestroy } from "svelte";
@@ -27,6 +16,17 @@
   }
 
   onMount(async () => {
+    const {
+      Chart,
+      LineController,
+      LinearScale,
+      CategoryScale,
+      PointElement,
+      LineElement,
+      Legend,
+      Tooltip
+    } = await import("chart.js");
+
     Chart.register(
       LineController,
       CategoryScale,
@@ -34,8 +34,7 @@
       PointElement,
       LineElement,
       Legend,
-      Tooltip,
-      LogarithmicScale
+      Tooltip
     );
     chartInstance = new Chart(canvas, config);
   });
