@@ -15,8 +15,14 @@
 
       return {
         props: {
-          data,
-          timelineData
+          mainState: {
+            data,
+            loading: false
+          },
+          chartState: {
+            data: timelineData,
+            loading: false
+          }
         },
         maxage: 3600
       };
@@ -30,15 +36,15 @@
 
 <script lang="ts">
   import { format } from "date-fns";
-  import { browser } from "$app/env";
   import { goto } from "$app/navigation";
   import { fade } from "svelte/transition";
   import StatCard from "$lib/StatCard.svelte";
   import LoadingSpinner from "$lib/LoadingSpinner.svelte";
   import Chart from "$lib/Chart.svelte";
+  import type { DailyCovidData } from "$lib/types";
 
-  export let data: DailyCovidData;
-  export let timelineData;
+  export let mainState: { loading: boolean; data: DailyCovidData };
+  export let chartState: { loading: boolean; data: any };
 
   let loading = false;
   let startDate = format(new Date("02/26/2020"), "yyyy-MM-dd");
@@ -54,30 +60,29 @@
       // transition
       const delay = () =>
         setTimeout(() => {
-          if (navigated) loading = false;
+          if (navigated) mainState.loading = false;
           else delay();
         }, 500);
 
       let navigated = false;
-      loading = true;
+      mainState.loading = true;
       delay();
       await goto(url);
       navigated = true;
     };
   }
 
-  async function refetch(startDate, endDate) {
+  async function updateChart() {
     try {
-      timelineData = await (
+      chartState.loading = true;
+      chartState.data = await (
         await fetch(`/api/historicalCovidData.json?start=${startDate}&end=${endDate}`)
       ).json();
     } catch (error) {
       // ignore error and keep original state
+    } finally {
+      chartState.loading = false;
     }
-  }
-
-  $: {
-    if (browser) refetch(startDate, endDate);
   }
 </script>
 
@@ -86,7 +91,7 @@
 {:else}
   <div in:fade>
     <p class="mb-4">
-      {new Date(data.currentDate).toLocaleString("pt-pt", {
+      {new Date(mainState.data.currentDate).toLocaleString("pt-pt", {
         month: "long",
         day: "numeric",
         year: "numeric"
@@ -95,19 +100,19 @@
 
     <div class="flex flex-col space-y-2 mb-8 sm:space-x-4 sm:space-y-0 sm:flex-row">
       <a
-        href={data.previousLink}
+        href={mainState.data.previousLink}
         class="underline"
-        on:click={handleNavigation(data.previousLink)}
+        on:click={handleNavigation(mainState.data.previousLink)}
         sveltekit:prefetch
       >
         Ver dados do dia anterior
       </a>
 
-      {#if data.nextLink}
+      {#if mainState.data.nextLink}
         <a
-          href={data.nextLink}
+          href={mainState.data.nextLink}
           class="underline"
-          on:click={handleNavigation(data.nextLink)}
+          on:click={handleNavigation(mainState.data.nextLink)}
           sveltekit:prefetch
         >
           Ver dados do dia seguinte
@@ -120,21 +125,33 @@
     </div>
 
     <div class="grid gap-2">
-      <StatCard title="Casos" statCount={data.cases} newStatCount={data.newCases} />
+      <StatCard
+        title="Casos"
+        statCount={mainState.data.cases}
+        newStatCount={mainState.data.newCases}
+      />
 
-      <StatCard title="Óbitos" statCount={data.deaths} newStatCount={data.newDeaths} />
+      <StatCard
+        title="Óbitos"
+        statCount={mainState.data.deaths}
+        newStatCount={mainState.data.newDeaths}
+      />
 
       <StatCard
         title="Internados"
-        statCount={data.hospitalized}
-        newStatCount={data.newHospitalized}
+        statCount={mainState.data.hospitalized}
+        newStatCount={mainState.data.newHospitalized}
       />
 
-      <StatCard title="Cuidados Intensivos" statCount={data.uci} newStatCount={data.newUci} />
+      <StatCard
+        title="Cuidados Intensivos"
+        statCount={mainState.data.uci}
+        newStatCount={mainState.data.newUci}
+      />
     </div>
 
     <div class="mt-10">
-      <div class="flex flex-row space-x-8 text-color mb-8">
+      <div class="flex flex-row gap-8 text-color mb-8 flex-wrap">
         <label>
           Start Date
           <input type="date" bind:value={startDate} class="text-black rounded" />
@@ -144,65 +161,77 @@
           End Date
           <input type="date" bind:value={endDate} class="text-black rounded" />
         </label>
+
+        <button class="rounded bg-gray-200 text-black px-2 shadow-sm" on:click={updateChart}>
+          Atualizar gráfico
+        </button>
       </div>
 
-      <Chart
-        config={{
-          type: "line",
-          options: {
-            plugins: {
-              legend: {
-                display: true,
-                labels: {
-                  color: "white"
+      {#if chartState.loading}
+        <div class="h-[500px]">
+          <LoadingSpinner />
+        </div>
+      {:else}
+        <Chart
+          width="1000"
+          height="500"
+          config={{
+            type: "line",
+            options: {
+              plugins: {
+                legend: {
+                  display: true,
+                  labels: {
+                    color: "white"
+                  }
+                },
+                tooltip: {
+                  enabled: true
                 }
               },
-              tooltip: {
-                enabled: true
+              scales: {
+                x: {
+                  grid: {
+                    display: false,
+                    borderColor: "white"
+                  },
+                  ticks: {
+                    color: "white",
+                    autoSkipPadding: 30
+                  }
+                },
+                y: {
+                  grid: {
+                    display: false,
+                    borderColor: "white"
+                  },
+                  ticks: {
+                    color: "white"
+                  }
+                }
               }
             },
-            scales: {
-              x: {
-                grid: {
-                  display: false,
-                  borderColor: "white"
-                },
-                ticks: {
-                  color: "white",
-                  autoSkipPadding: 30
+            data: {
+              labels: chartState.data.dates.map((date) =>
+                new Date(date).toLocaleDateString("pt", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric"
+                })
+              ),
+              datasets: [
+                {
+                  label: "New cases",
+                  data: chartState.data.cases,
+                  fill: false,
+                  borderColor: "white",
+                  tension: 1
                 }
-              },
-              y: {
-                grid: {
-                  display: false,
-                  borderColor: "white"
-                },
-                ticks: {
-                  color: "white"
-                }
-              }
+              ]
             }
-          },
-          data: {
-            labels: timelineData.dates.map((date) =>
-              new Date(date).toLocaleDateString("pt", {
-                day: "numeric",
-                month: "short",
-                year: "numeric"
-              })
-            ),
-            datasets: [
-              {
-                label: "New cases",
-                data: timelineData.cases,
-                fill: false,
-                borderColor: "white",
-                tension: 1
-              }
-            ]
-          }
-        }}
-      />
+          }}
+        />
+      {/if}
     </div>
   </div>
 {/if}

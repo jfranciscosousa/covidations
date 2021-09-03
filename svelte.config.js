@@ -10,7 +10,10 @@ const config = {
       defaults: {
         style: "postcss"
       },
-      postcss: true
+
+      postcss: true,
+      "postcss": true,
+      "postcss": true
     })
   ],
   kit: {

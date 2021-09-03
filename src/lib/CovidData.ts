@@ -1,4 +1,5 @@
 import { format } from "date-fns";
+import type { DailyCovidData } from "./types";
 
 export class CovidData {
   private prevData: Record<string, string>;

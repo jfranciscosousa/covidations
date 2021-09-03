@@ -1,13 +1,17 @@
 import type { Response, Request } from "@sveltejs/kit";
 import type { StrictBody } from "@sveltejs/kit/types/hooks";
-import { parse } from "date-fns";
+import { parse, sub, add } from "date-fns";
 import fetch from "node-fetch";
 import { formatDateToApi, getLatestAvailableDate } from "./_helpers";
 
 function extractDates(data: any): Date[] {
-  return Object.values(data.data).map((unparsedDate) =>
-    parse(unparsedDate as string, "dd-MM-yyyy", new Date())
+  const dates = Object.values(data.data).map((unparsedDate, index) =>
+    parse(unparsedDate as string, "dd-MM-yyyy", new Date(0, 0, 0, 12))
   );
+
+  dates.shift();
+
+  return dates;
 }
 
 function getValue(data, key, index) {
@@ -15,12 +19,17 @@ function getValue(data, key, index) {
 }
 
 async function getStartDate(startDateString) {
-  const startDate = new Date(startDateString || "02/26/2020");
   const earliestDate = new Date("02/26/2020");
 
-  if (startDate < earliestDate) return earliestDate;
+  if (!startDateString) return earliestDate;
 
-  return startDate;
+  const startDate = new Date(startDateString);
+
+  if (startDate <= earliestDate) {
+    return earliestDate;
+  }
+
+  return sub(startDate, { days: 1 });
 }
 
 async function getEndDate(endDateString) {
@@ -29,7 +38,7 @@ async function getEndDate(endDateString) {
 
   if (latestDate < endDate) return latestDate;
 
-  return endDate;
+  return add(endDate, { days: 1 });
 }
 
 export async function get({ query }: Request): Promise<Response> {
@@ -45,7 +54,7 @@ export async function get({ query }: Request): Promise<Response> {
     status: 200,
     body: {
       dates,
-      cases: dates.map((date, index) => getValue(json, "confirmados", index))
+      cases: dates.map((date, index) => getValue(json, "confirmados", index + 1))
     } as unknown as StrictBody,
     headers: {
       "cache-control": "public, s-maxage=3600"
