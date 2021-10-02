@@ -1,5 +1,5 @@
 import { sub, isValid } from "date-fns";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import type { Request, Response } from "@sveltejs/kit";
 import { CovidData } from "$lib/CovidData";
 import { formatDateToApi, getLatestAvailableDate } from "./_helpers";

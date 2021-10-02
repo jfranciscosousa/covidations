@@ -11,7 +11,7 @@ export const handle: Handle = async ({ request, resolve }) => {
   const cacheControlHeader = response?.headers?.["cache-control"];
 
   if (cacheControlHeader) {
-    response.headers["cache-control"] = cacheControlHeader.replace("max-age", "s-maxage");
+    response.headers["cache-control"] = (cacheControlHeader as string).replace("max-age", "s-maxage");
   }
 
   return {

@@ -5,17 +5,7 @@ import buildAdapter from "@sveltejs/adapter-vercel";
 const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
-  preprocess: [
-    sveltePreprocess({
-      defaults: {
-        style: "postcss"
-      },
-
-      postcss: true,
-      "postcss": true,
-      "postcss": true
-    })
-  ],
+  preprocess: [sveltePreprocess({})],
   kit: {
     adapter: buildAdapter(),
 

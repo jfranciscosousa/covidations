@@ -1,7 +1,7 @@
 import type { Response, Request } from "@sveltejs/kit";
 import type { StrictBody } from "@sveltejs/kit/types/hooks";
 import { parse, sub, add } from "date-fns";
-import fetch from "node-fetch";
+import fetch from "cross-fetch";
 import { formatDateToApi, getLatestAvailableDate } from "./_helpers";
 
 function extractDates(data: any): Date[] {

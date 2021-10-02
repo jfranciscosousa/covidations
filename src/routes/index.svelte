@@ -42,11 +42,11 @@
   import LoadingSpinner from "$lib/LoadingSpinner.svelte";
   import Chart from "$lib/Chart.svelte";
   import type { DailyCovidData } from "$lib/types";
+  import sleep from "$lib/sleep";
 
   export let mainState: { loading: boolean; data: DailyCovidData };
   export let chartState: { loading: boolean; data: any };
 
-  let loading = false;
   let startDate = format(new Date("02/26/2020"), "yyyy-MM-dd");
   let endDate = format(new Date(), "yyyy-MM-dd");
 
@@ -58,17 +58,10 @@
       // but it's to basically artificially delay
       // all requests by 500ms to give a nice
       // transition
-      const delay = () =>
-        setTimeout(() => {
-          if (navigated) mainState.loading = false;
-          else delay();
-        }, 500);
 
-      let navigated = false;
       mainState.loading = true;
-      delay();
-      await goto(url);
-      navigated = true;
+      await Promise.all([goto(url), sleep(500)]);
+      mainState.loading = false;
     };
   }
 
@@ -86,10 +79,12 @@
   }
 </script>
 
-{#if loading}
-  <LoadingSpinner />
+{#if mainState.loading}
+  <div in:fade out:fade class="w-full h-full">
+    <LoadingSpinner />
+  </div>
 {:else}
-  <div in:fade>
+  <div in:fade out:fade>
     <p class="mb-4">
       {new Date(mainState.data.currentDate).toLocaleString("pt-pt", {
         month: "long",
