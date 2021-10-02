@@ -1,10 +1,10 @@
 <script lang="ts">
-  import type { ChartConfiguration } from "chart.js";
+  import type { Chart, ChartConfiguration } from "chart.js";
 
   import { onMount, onDestroy } from "svelte";
 
-  let canvas;
-  let chartInstance;
+  let canvas: HTMLCanvasElement;
+  let chartInstance: Chart;
   export let config: ChartConfiguration;
   export let width = undefined;
   export let height = undefined;
