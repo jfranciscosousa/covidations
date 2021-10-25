@@ -5,11 +5,17 @@ import buildAdapter from "@sveltejs/adapter-vercel";
 const config = {
   // Consult https://github.com/sveltejs/svelte-preprocess
   // for more information about preprocessors
-  preprocess: [sveltePreprocess({})],
+  preprocess: [
+    sveltePreprocess({
+      postcss: true
+    })
+  ],
   kit: {
     adapter: buildAdapter(),
-
-    target: "#svelte"
+    target: "#svelte",
+    vite: {
+      optimizeDeps: { include: ["chart.js", "cross-fetch"] }
+    }
   }
 };
 

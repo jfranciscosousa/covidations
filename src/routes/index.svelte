@@ -79,157 +79,159 @@
   }
 </script>
 
-{#if mainState.loading}
-  <div in:fade out:fade class="w-full h-full">
-    <LoadingSpinner />
-  </div>
-{:else}
-  <div in:fade out:fade>
-    <p class="mb-4">
-      {new Date(mainState.data.currentDate).toLocaleString("pt-pt", {
-        month: "long",
-        day: "numeric",
-        year: "numeric"
-      })}
-    </p>
+<div class="relative w-full h-full">
+  {#if mainState.loading}
+    <div in:fade out:fade={{ duration: 350 }} class="w-full h-full fixed top-0 left-0">
+      <LoadingSpinner />
+    </div>
+  {:else}
+    <div in:fade={{ delay: 400 }} out:fade>
+      <p class="mb-4">
+        {new Date(mainState.data.currentDate).toLocaleString("pt-pt", {
+          month: "long",
+          day: "numeric",
+          year: "numeric"
+        })}
+      </p>
 
-    <div class="flex flex-col space-y-2 mb-8 sm:space-x-4 sm:space-y-0 sm:flex-row">
-      <a
-        href={mainState.data.previousLink}
-        class="underline"
-        on:click={handleNavigation(mainState.data.previousLink)}
-        sveltekit:prefetch
-      >
-        Ver dados do dia anterior
-      </a>
-
-      {#if mainState.data.nextLink}
+      <div class="flex flex-col space-y-2 mb-8 sm:space-x-4 sm:space-y-0 sm:flex-row">
         <a
-          href={mainState.data.nextLink}
+          href={mainState.data.previousLink}
           class="underline"
-          on:click={handleNavigation(mainState.data.nextLink)}
+          on:click={handleNavigation(mainState.data.previousLink)}
           sveltekit:prefetch
         >
-          Ver dados do dia seguinte
+          Ver dados do dia anterior
         </a>
 
-        <a href="/" class="underline" on:click={handleNavigation("/")} sveltekit:prefetch>
-          Ver dados de hoje
-        </a>
-      {/if}
-    </div>
+        {#if mainState.data.nextLink}
+          <a
+            href={mainState.data.nextLink}
+            class="underline"
+            on:click={handleNavigation(mainState.data.nextLink)}
+            sveltekit:prefetch
+          >
+            Ver dados do dia seguinte
+          </a>
 
-    <div class="grid gap-2">
-      <StatCard
-        title="Casos"
-        statCount={mainState.data.cases}
-        newStatCount={mainState.data.newCases}
-      />
-
-      <StatCard
-        title="Óbitos"
-        statCount={mainState.data.deaths}
-        newStatCount={mainState.data.newDeaths}
-      />
-
-      <StatCard
-        title="Internados"
-        statCount={mainState.data.hospitalized}
-        newStatCount={mainState.data.newHospitalized}
-      />
-
-      <StatCard
-        title="Cuidados Intensivos"
-        statCount={mainState.data.uci}
-        newStatCount={mainState.data.newUci}
-      />
-    </div>
-
-    <div class="mt-10">
-      <div class="flex flex-row gap-8 text-color mb-8 flex-wrap">
-        <label>
-          Start Date
-          <input type="date" bind:value={startDate} class="text-black rounded" />
-        </label>
-
-        <label>
-          End Date
-          <input type="date" bind:value={endDate} class="text-black rounded" />
-        </label>
-
-        <button class="rounded bg-gray-200 text-black px-2 shadow-sm" on:click={updateChart}>
-          Atualizar gráfico
-        </button>
+          <a href="/" class="underline" on:click={handleNavigation("/")} sveltekit:prefetch>
+            Ver dados de hoje
+          </a>
+        {/if}
       </div>
 
-      {#if chartState.loading}
-        <div class="h-[500px]">
-          <LoadingSpinner />
+      <div class="grid gap-2">
+        <StatCard
+          title="Casos"
+          statCount={mainState.data.cases}
+          newStatCount={mainState.data.newCases}
+        />
+
+        <StatCard
+          title="Óbitos"
+          statCount={mainState.data.deaths}
+          newStatCount={mainState.data.newDeaths}
+        />
+
+        <StatCard
+          title="Internados"
+          statCount={mainState.data.hospitalized}
+          newStatCount={mainState.data.newHospitalized}
+        />
+
+        <StatCard
+          title="Cuidados Intensivos"
+          statCount={mainState.data.uci}
+          newStatCount={mainState.data.newUci}
+        />
+      </div>
+
+      <div class="mt-10">
+        <div class="flex flex-row gap-8 text-color mb-8 flex-wrap">
+          <label>
+            Start Date
+            <input type="date" bind:value={startDate} class="text-black rounded" />
+          </label>
+
+          <label>
+            End Date
+            <input type="date" bind:value={endDate} class="text-black rounded" />
+          </label>
+
+          <button class="rounded bg-gray-200 text-black px-2 shadow-sm" on:click={updateChart}>
+            Atualizar gráfico
+          </button>
         </div>
-      {:else}
-        <Chart
-          width="1000"
-          height="500"
-          config={{
-            type: "line",
-            options: {
-              plugins: {
-                legend: {
-                  display: true,
-                  labels: {
-                    color: "white"
+
+        {#if chartState.loading}
+          <div class="h-[500px]">
+            <LoadingSpinner />
+          </div>
+        {:else}
+          <Chart
+            width="1000"
+            height="500"
+            config={{
+              type: "line",
+              options: {
+                plugins: {
+                  legend: {
+                    display: true,
+                    labels: {
+                      color: "white"
+                    }
+                  },
+                  tooltip: {
+                    enabled: true
                   }
                 },
-                tooltip: {
-                  enabled: true
+                scales: {
+                  x: {
+                    grid: {
+                      display: false,
+                      borderColor: "white"
+                    },
+                    ticks: {
+                      color: "white",
+                      autoSkipPadding: 30
+                    }
+                  },
+                  y: {
+                    grid: {
+                      display: false,
+                      borderColor: "white"
+                    },
+                    ticks: {
+                      color: "white"
+                    }
+                  }
                 }
               },
-              scales: {
-                x: {
-                  grid: {
-                    display: false,
-                    borderColor: "white"
-                  },
-                  ticks: {
-                    color: "white",
-                    autoSkipPadding: 30
+              data: {
+                labels: chartState.data.dates.map((date) =>
+                  new Date(date).toLocaleDateString("pt", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric"
+                  })
+                ),
+                datasets: [
+                  {
+                    label: "New cases",
+                    data: chartState.data.cases,
+                    fill: false,
+                    borderColor: "white",
+                    tension: 1
                   }
-                },
-                y: {
-                  grid: {
-                    display: false,
-                    borderColor: "white"
-                  },
-                  ticks: {
-                    color: "white"
-                  }
-                }
+                ]
               }
-            },
-            data: {
-              labels: chartState.data.dates.map((date) =>
-                new Date(date).toLocaleDateString("pt", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric"
-                })
-              ),
-              datasets: [
-                {
-                  label: "New cases",
-                  data: chartState.data.cases,
-                  fill: false,
-                  borderColor: "white",
-                  tension: 1
-                }
-              ]
-            }
-          }}
-        />
-      {/if}
+            }}
+          />
+        {/if}
+      </div>
     </div>
-  </div>
-{/if}
+  {/if}
+</div>
 
 <style>
   .grid {
