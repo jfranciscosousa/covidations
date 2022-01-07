@@ -1,11 +1,10 @@
 <script lang="ts" context="module">
   import type { Load } from "@sveltejs/kit";
 
-  export const load: Load = async ({ fetch, params }) => {
-
-    const date = params.date;
-    const url = date ? `/api/dailyCovidData.json?date=${date}` : "/api/dailyCovidData.json";
-    const res: Response = (await fetch(url, { credentials: "omit" })) as never;
+  export const load: Load = async ({ fetch, url }) => {
+    const date = url.searchParams.get("date");
+    const apiUrl = date ? `/api/dailyCovidData.json?date=${date}` : "/api/dailyCovidData.json";
+    const res: Response = (await fetch(apiUrl, { credentials: "omit" })) as never;
     const timelineRes: Response = (await fetch("/api/historicalCovidData.json", {
       credentials: "omit"
     })) as never;
