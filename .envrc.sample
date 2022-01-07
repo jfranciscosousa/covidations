@@ -1,1 +1,1 @@
-export API_AUTH=Basic base64hash
+export API_AUTH=example
