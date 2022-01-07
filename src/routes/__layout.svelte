@@ -6,6 +6,8 @@
   <nav>
     <a href="/">
       <h1 class="text-3xl mb-4">Ponto situação COVID em Portugal</h1>
+
+      <p>Dados retirados da <a class="underline" href="https://covid19-api.vost.pt/">VOST</a></p>
     </a>
   </nav>
 
