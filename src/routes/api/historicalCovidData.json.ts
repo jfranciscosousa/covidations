@@ -41,11 +41,14 @@ async function getEndDate(endDateString) {
   return add(endDate, { days: 1 });
 }
 
-export async function get({ query }: Request): Promise<Response> {
-  const startDate = formatDateToApi(await getStartDate(query.get("start")));
-  const endDate = formatDateToApi(await getEndDate(query.get("end")));
+export async function get({ url }: Request): Promise<Response> {
+  const startDate = formatDateToApi(await getStartDate(url.searchParams.get("start")));
+  const endDate = formatDateToApi(await getEndDate(url.searchParams.get("end")));
   const res = await fetch(
-    `https://covid19-api.vost.pt/Requests/get_entry/${startDate}_until_${endDate}`
+    `https://covid19-api.vost.pt/Requests/get_entry/${startDate}_until_${endDate}`,
+    {
+      headers: { Authorization: process.env["API_AUTH"] }
+    }
   );
   const json = await res.json();
   const dates = extractDates(json);

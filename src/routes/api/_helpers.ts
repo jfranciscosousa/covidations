@@ -1,7 +1,9 @@
 import { parse, format } from "date-fns";
 
 export async function getLatestAvailableDate(): Promise<Date> {
-  const latestDateRes = await fetch("https://covid19-api.vost.pt/Requests/get_last_update");
+  const latestDateRes = await fetch("https://covid19-api.vost.pt/Requests/get_last_update", {
+    headers: { Authorization: "Basic ZnNvdXNhOktvV0l5NUR6WWJWWlh6SmdQYjYz" }
+  });
 
   if (!latestDateRes.ok) throw "API Error";
 

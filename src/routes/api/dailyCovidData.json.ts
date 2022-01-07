@@ -21,8 +21,12 @@ function getPreviousDate(currentDate) {
 
 async function getData(previousDate, currentDate) {
   const [currentRes, prevRes] = await Promise.all([
-    fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`),
-    fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`)
+    fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`, {
+      headers: { Authorization: process.env["API_AUTH"] }
+    }),
+    fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`, {
+      headers: { Authorization: process.env["API_AUTH"] }
+    })
   ]);
 
   if (!currentRes.ok || !prevRes.ok) throw "API Error";
@@ -32,9 +36,9 @@ async function getData(previousDate, currentDate) {
   return { prevData, currData };
 }
 
-export async function get({ query }: Request): Promise<Response> {
+export async function get({ url }: Request): Promise<Response> {
   const latestDate = await getLatestAvailableDate();
-  const currentDate = getCurrentDate(query.get("date"), latestDate);
+  const currentDate = getCurrentDate(url.searchParams.get("date"), latestDate);
   const previousDate = getPreviousDate(currentDate);
   const data = await getData(previousDate, currentDate);
 
