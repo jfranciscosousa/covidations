@@ -1,6 +1,6 @@
 import type { Response, Request } from "@sveltejs/kit";
 import type { StrictBody } from "@sveltejs/kit/types/hooks";
-import { parse, sub, add } from "date-fns";
+import { parse, sub } from "date-fns";
 import fetch from "cross-fetch";
 import { formatDateToApi, getLatestAvailableDate } from "./_helpers";
 
@@ -38,7 +38,7 @@ async function getEndDate(endDateString) {
 
   if (latestDate < endDate) return latestDate;
 
-  return add(endDate, { days: 1 });
+  return endDate;
 }
 
 export async function get({ url }: Request): Promise<Response> {
