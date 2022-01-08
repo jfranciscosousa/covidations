@@ -46,6 +46,7 @@
   import Chart from "$lib/Chart.svelte";
   import type { DailyCovidData } from "$lib/types";
   import sleep from "$lib/sleep";
+  import type { ChartConfiguration } from "chart.js";
 
   export let dailyDataLoading: boolean;
   export let dailyData: DailyCovidData;
@@ -73,9 +74,7 @@
     try {
       chartDataLoading = true;
       chartData = await (
-        await fetch(
-          `/api/historicalCovidData.json?start=${chartStartDate}&end=${chartEndDate}`
-        )
+        await fetch(`/api/historicalCovidData.json?start=${chartStartDate}&end=${chartEndDate}`)
       ).json();
     } catch (error) {
       // ignore error and keep original state
@@ -84,7 +83,7 @@
     }
   }
 
-  let CHART_CONFIG: any;
+  let CHART_CONFIG: ChartConfiguration;
 
   $: {
     CHART_CONFIG = {
@@ -138,7 +137,7 @@
             data: chartData.cases,
             fill: false,
             borderColor: "white",
-            tension: 1
+            tension: 0.2
           }
         ]
       }
@@ -188,17 +187,9 @@
       </div>
 
       <div class="grid gap-2">
-        <StatCard
-          title="Casos"
-          statCount={dailyData.cases}
-          newStatCount={dailyData.newCases}
-        />
+        <StatCard title="Casos" statCount={dailyData.cases} newStatCount={dailyData.newCases} />
 
-        <StatCard
-          title="Óbitos"
-          statCount={dailyData.deaths}
-          newStatCount={dailyData.newDeaths}
-        />
+        <StatCard title="Óbitos" statCount={dailyData.deaths} newStatCount={dailyData.newDeaths} />
 
         <StatCard
           title="Internados"
