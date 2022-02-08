@@ -24,11 +24,11 @@ async function getData(previousDate, currentDate) {
   const [currentRes, prevRes] = await Promise.all([
     fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`, {
       headers: { Authorization: process.env["API_AUTH"] },
-      signal: timeoutSignal(5000)
+      signal: timeoutSignal(3500)
     }),
     fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`, {
       headers: { Authorization: process.env["API_AUTH"] },
-      signal: timeoutSignal(5000)
+      signal: timeoutSignal(3500)
     })
   ]);
 

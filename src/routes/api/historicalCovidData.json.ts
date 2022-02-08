@@ -49,7 +49,7 @@ export async function get({ url }: Request): Promise<Response> {
     `https://covid19-api.vost.pt/Requests/get_entry/${startDate}_until_${endDate}`,
     {
       headers: { Authorization: process.env["API_AUTH"] },
-      signal: timeoutSignal(5000)
+      signal: timeoutSignal(3500)
     }
   );
   const json = await res.json();
