@@ -4,6 +4,7 @@ import type { Request, Response } from "@sveltejs/kit";
 import { CovidData } from "$lib/CovidData";
 import { formatDateToApi, getLatestAvailableDate } from "./_helpers";
 import type { StrictBody } from "@sveltejs/kit/types/hooks";
+import timeoutSignal from "$lib/timeoutSignal";
 
 function getCurrentDate(desiredDate, fallbackDate) {
   if (!desiredDate) return fallbackDate;
@@ -22,10 +23,12 @@ function getPreviousDate(currentDate) {
 async function getData(previousDate, currentDate) {
   const [currentRes, prevRes] = await Promise.all([
     fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`, {
-      headers: { Authorization: process.env["API_AUTH"] }
+      headers: { Authorization: process.env["API_AUTH"] },
+      signal: timeoutSignal(5000)
     }),
     fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`, {
-      headers: { Authorization: process.env["API_AUTH"] }
+      headers: { Authorization: process.env["API_AUTH"] },
+      signal: timeoutSignal(5000)
     })
   ]);
 

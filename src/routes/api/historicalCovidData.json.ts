@@ -3,6 +3,7 @@ import type { StrictBody } from "@sveltejs/kit/types/hooks";
 import { parse, sub } from "date-fns";
 import fetch from "cross-fetch";
 import { formatDateToApi, getLatestAvailableDate } from "./_helpers";
+import timeoutSignal from "$lib/timeoutSignal";
 
 function extractDates(data: any): Date[] {
   const dates = Object.values(data.data).map((unparsedDate, index) =>
@@ -47,7 +48,8 @@ export async function get({ url }: Request): Promise<Response> {
   const res = await fetch(
     `https://covid19-api.vost.pt/Requests/get_entry/${startDate}_until_${endDate}`,
     {
-      headers: { Authorization: process.env["API_AUTH"] }
+      headers: { Authorization: process.env["API_AUTH"] },
+      signal: timeoutSignal(5000)
     }
   );
   const json = await res.json();
