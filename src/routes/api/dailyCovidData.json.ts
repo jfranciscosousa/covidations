@@ -1,9 +1,8 @@
 import { sub, isValid, parse } from "date-fns";
-import type { Request, Response } from "@sveltejs/kit";
-import { CovidData } from "$lib/CovidData";
-import { formatDateToApi } from "./_helpers";
-import type { StrictBody } from "@sveltejs/kit/types/hooks";
-import { getCovidDataset } from "$lib/api/data";
+import { DailyCovidData } from "$lib/utils/CovidData";
+import { formatDateToApi } from "$lib/utils/dates";
+import { getCovidDataset } from "$lib/utils/covidDataSource";
+import type { RequestHandler } from "@sveltejs/kit";
 
 function getCurrentDate(desiredDate, fallbackDate) {
   if (!desiredDate) return fallbackDate;
@@ -26,7 +25,7 @@ async function getDataInternal(data, previousDate, currentDate) {
   return { prevData, currData };
 }
 
-export async function get({ url }: Request): Promise<Response> {
+export const get: RequestHandler = async ({ url }) => {
   const covidDataset = await getCovidDataset();
   const latestDate = parse(covidDataset[covidDataset.length - 1].data, "dd-MM-yyyy", new Date());
   const currentDate = getCurrentDate(url.searchParams.get("date"), latestDate);
@@ -35,14 +34,17 @@ export async function get({ url }: Request): Promise<Response> {
 
   return {
     status: 200,
-    body: new CovidData({
-      ...data,
-      previousDate,
-      currentDate,
-      latestDate
-    }).toJSON() as unknown as StrictBody,
-    headers: {
-      "cache-control": "public, s-maxage=3600"
-    }
+    body: JSON.stringify(
+      new DailyCovidData({
+        ...data,
+        previousDate,
+        currentDate,
+        latestDate
+      }).toJSON()
+    ),
+    headers: new Headers({
+      "cache-control": "public, s-maxage=3600",
+      "content-type": "application/json"
+    })
   };
-}
+};

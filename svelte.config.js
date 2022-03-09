@@ -12,7 +12,7 @@ const config = {
   ],
   kit: {
     adapter: buildAdapter(),
-    target: "#svelte",
+
     vite: {
       optimizeDeps: { include: ["chart.js", "cross-fetch"] }
     }

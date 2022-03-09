@@ -41,15 +41,15 @@
   import { format, sub } from "date-fns";
   import { goto } from "$app/navigation";
   import { fade } from "svelte/transition";
-  import StatCard from "$lib/StatCard.svelte";
-  import LoadingSpinner from "$lib/LoadingSpinner.svelte";
-  import Chart from "$lib/Chart.svelte";
-  import type { DailyCovidData } from "$lib/types";
-  import sleep from "$lib/sleep";
+  import StatCard from "$lib/components/StatCard.svelte";
+  import LoadingSpinner from "$lib/components/LoadingSpinner.svelte";
+  import Chart from "$lib/components/Chart.svelte";
+  import type { DailyCovidDataType } from "$lib/utils/CovidData";
+  import sleep from "$lib/utils/sleep";
   import type { ChartConfiguration } from "chart.js";
 
   export let dailyDataLoading: boolean;
-  export let dailyData: DailyCovidData;
+  export let dailyData: DailyCovidDataType;
   export let chartStartDate: string;
   export let chartEndDate: string;
   export let chartDataLoading: boolean;

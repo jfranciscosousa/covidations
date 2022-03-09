@@ -1,7 +1,22 @@
 import { format } from "date-fns";
-import type { DailyCovidData } from "./types";
 
-export class CovidData {
+export interface DailyCovidDataType {
+  currentDate: string;
+  previousDate: string;
+  latestDate: string;
+  cases: number;
+  newCases: number;
+  deaths: number;
+  newDeaths: number;
+  hospitalized: number;
+  newHospitalized: number;
+  uci: number;
+  newUci: number;
+  previousLink: string;
+  nextLink: string;
+}
+
+export class DailyCovidData {
   private prevData: Record<string, string>;
   private currData: Record<string, string>;
   currentDate: Date;
@@ -16,52 +31,36 @@ export class CovidData {
     this.latestDate = new Date(data.latestDate);
   }
 
-  private getValue(dataObj, key) {
-    return dataObj[key];
-  }
-
   get cases(): number {
-    return Number(this.getValue(this.currData, "confirmados"));
+    return Number(this.currData.confirmados);
   }
 
   get newCases(): number {
-    return (
-      Number(this.getValue(this.currData, "confirmados")) -
-      Number(this.getValue(this.prevData, "confirmados"))
-    );
+    return Number(this.currData.confirmados) - Number(this.prevData.confirmados);
   }
 
   get deaths(): number {
-    return Number(this.getValue(this.currData, "obitos"));
+    return Number(this.currData.obitos);
   }
 
   get newDeaths(): number {
-    return (
-      Number(this.getValue(this.currData, "obitos")) -
-      Number(this.getValue(this.prevData, "obitos"))
-    );
+    return Number(this.currData.obitos) - Number(this.prevData.obitos);
   }
 
   get hospitalized(): number {
-    return Number(this.getValue(this.currData, "internados"));
+    return Number(this.currData.internados);
   }
 
   get newHospitalized(): number {
-    return (
-      Number(this.getValue(this.currData, "internados")) -
-      Number(this.getValue(this.prevData, "internados"))
-    );
+    return Number(this.currData.internados) - Number(this.prevData.internados);
   }
 
   get uci(): number {
-    return Number(this.getValue(this.currData, "internados_uci"));
+    return Number(this.currData.internados_uci);
   }
 
   get newUci(): number {
-    return (
-      Number(this.getValue(this.currData, "internados_uci")) -
-      Number(this.getValue(this.prevData, "internados_uci"))
-    );
+    return Number(this.currData.internados_uci) - Number(this.prevData.internados_uci);
   }
 
   get previousLink(): string {
@@ -77,7 +76,7 @@ export class CovidData {
     return `/?date=${format(nextDay, "yyyy-MM-dd")}`;
   }
 
-  toJSON(): DailyCovidData {
+  toJSON(): DailyCovidDataType {
     return {
       currentDate: this.currentDate.toISOString(),
       previousDate: this.previousDate.toISOString(),

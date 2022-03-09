@@ -2,7 +2,7 @@
 
 Everything you need to build a Svelte project, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/master/packages/create-svelte);
 
-Sample project to render a very simple dashboard with data from https://covid19-api.vost.pt/.
+Sample project to render a very simple dashboard with data from https://github.com/dssg-pt/covid19pt-data.
 
 ## Creating a project
 

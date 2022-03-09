@@ -1,6 +1,6 @@
-import type { Response, Request } from "@sveltejs/kit";
+import { getCovidDataset } from "$lib/utils/covidDataSource";
+import type { RequestHandler } from "@sveltejs/kit";
 import { parse, sub } from "date-fns";
-import { getCovidDataset } from "$lib/api/data";
 
 async function getStartDate(startDateString) {
   const earliestDate = new Date("02/26/2020");
@@ -24,7 +24,7 @@ async function getEndDate(endDateString, latestDate) {
   return endDate;
 }
 
-export async function get({ url }: Request): Promise<Response> {
+export const get: RequestHandler = async ({ url }) => {
   const covidDataset = await getCovidDataset();
   const startDate = await getStartDate(url.searchParams.get("start"));
   const latestDate = parse(covidDataset[covidDataset.length - 1].data, "dd-MM-yyyy", new Date());
@@ -46,7 +46,8 @@ export async function get({ url }: Request): Promise<Response> {
     status: 200,
     body: JSON.stringify(filteredCovidDataset),
     headers: {
-      "cache-control": "public, s-maxage=3600"
+      "cache-control": "public, s-maxage=3600",
+      "content-type": "application/json"
     }
   };
 }
