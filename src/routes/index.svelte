@@ -124,7 +124,7 @@
         }
       },
       data: {
-        labels: chartData.dates.map((date) =>
+        labels: chartData.map(({ date }) =>
           new Date(date).toLocaleDateString("pt", {
             day: "numeric",
             month: "short",
@@ -134,7 +134,7 @@
         datasets: [
           {
             label: "New cases",
-            data: chartData.cases,
+            data: chartData.map(({ newCases }) => newCases),
             fill: false,
             borderColor: "white",
             tension: 0.2

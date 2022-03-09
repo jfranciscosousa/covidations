@@ -1,10 +1,9 @@
-import { sub, isValid } from "date-fns";
-import fetch from "cross-fetch";
+import { sub, isValid, parse } from "date-fns";
 import type { Request, Response } from "@sveltejs/kit";
 import { CovidData } from "$lib/CovidData";
-import { formatDateToApi, getLatestAvailableDate } from "./_helpers";
+import { formatDateToApi } from "./_helpers";
 import type { StrictBody } from "@sveltejs/kit/types/hooks";
-import timeoutSignal from "$lib/timeoutSignal";
+import { getCovidDataset } from "$lib/api/data";
 
 function getCurrentDate(desiredDate, fallbackDate) {
   if (!desiredDate) return fallbackDate;
@@ -20,30 +19,19 @@ function getPreviousDate(currentDate) {
   return sub(currentDate, { days: 1 });
 }
 
-async function getData(previousDate, currentDate) {
-  const [currentRes, prevRes] = await Promise.all([
-    fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(currentDate)}`, {
-      headers: { Authorization: process.env["API_AUTH"] },
-      signal: timeoutSignal(1000)
-    }),
-    fetch(`https://covid19-api.vost.pt/Requests/get_entry/${formatDateToApi(previousDate)}`, {
-      headers: { Authorization: process.env["API_AUTH"] },
-      signal: timeoutSignal(1000)
-    })
-  ]);
-
-  if (!currentRes.ok || !prevRes.ok) throw "API Error";
-
-  const [prevData, currData] = await Promise.all([prevRes.json(), currentRes.json()]);
+async function getDataInternal(data, previousDate, currentDate) {
+  const prevData = data.find((item) => item.data === formatDateToApi(previousDate));
+  const currData = data.find((item) => item.data === formatDateToApi(currentDate));
 
   return { prevData, currData };
 }
 
 export async function get({ url }: Request): Promise<Response> {
-  const latestDate = await getLatestAvailableDate();
+  const covidDataset = await getCovidDataset();
+  const latestDate = parse(covidDataset[covidDataset.length - 1].data, "dd-MM-yyyy", new Date());
   const currentDate = getCurrentDate(url.searchParams.get("date"), latestDate);
   const previousDate = getPreviousDate(currentDate);
-  const data = await getData(previousDate, currentDate);
+  const data = await getDataInternal(covidDataset, previousDate, currentDate);
 
   return {
     status: 200,

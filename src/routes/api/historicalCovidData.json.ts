@@ -1,23 +1,6 @@
 import type { Response, Request } from "@sveltejs/kit";
-import type { StrictBody } from "@sveltejs/kit/types/hooks";
 import { parse, sub } from "date-fns";
-import fetch from "cross-fetch";
-import { formatDateToApi, getLatestAvailableDate } from "./_helpers";
-import timeoutSignal from "$lib/timeoutSignal";
-
-function extractDates(data: any): Date[] {
-  const dates = Object.values(data.data).map((unparsedDate, index) =>
-    parse(unparsedDate as string, "dd-MM-yyyy", new Date(0, 0, 0, 12))
-  );
-
-  dates.shift();
-
-  return dates;
-}
-
-function getValue(data, key, index) {
-  return Number(Object.values(data[key])[index]) - Number(Object.values(data[key])[index - 1]) || 0;
-}
+import { getCovidDataset } from "$lib/api/data";
 
 async function getStartDate(startDateString) {
   const earliestDate = new Date("02/26/2020");
@@ -33,9 +16,8 @@ async function getStartDate(startDateString) {
   return sub(startDate, { days: 1 });
 }
 
-async function getEndDate(endDateString) {
+async function getEndDate(endDateString, latestDate) {
   const endDate = new Date(endDateString || new Date());
-  const latestDate = await getLatestAvailableDate();
 
   if (latestDate < endDate) return latestDate;
 
@@ -43,24 +25,26 @@ async function getEndDate(endDateString) {
 }
 
 export async function get({ url }: Request): Promise<Response> {
-  const startDate = formatDateToApi(await getStartDate(url.searchParams.get("start")));
-  const endDate = formatDateToApi(await getEndDate(url.searchParams.get("end")));
-  const res = await fetch(
-    `https://covid19-api.vost.pt/Requests/get_entry/${startDate}_until_${endDate}`,
-    {
-      headers: { Authorization: process.env["API_AUTH"] },
-      signal: timeoutSignal(1000)
-    }
-  );
-  const json = await res.json();
-  const dates = extractDates(json);
+  const covidDataset = await getCovidDataset();
+  const startDate = await getStartDate(url.searchParams.get("start"));
+  const latestDate = parse(covidDataset[covidDataset.length - 1].data, "dd-MM-yyyy", new Date());
+  const endDate = await getEndDate(url.searchParams.get("end"), latestDate);
+
+  const filteredCovidDataset = covidDataset
+    .filter(({ data }) => {
+      const date = parse(data, "dd-MM-yyyy", new Date());
+
+      // This, due to reasons I don't want to delve deep, makes an inclusive filter
+      return date > startDate && date <= endDate;
+    })
+    .map(({ data, confirmados_novos }) => ({
+      date: parse(data, "dd-MM-yyyy", new Date()),
+      newCases: confirmados_novos
+    }));
 
   return {
     status: 200,
-    body: {
-      dates,
-      cases: dates.map((date, index) => getValue(json, "confirmados", index + 1))
-    } as unknown as StrictBody,
+    body: JSON.stringify(filteredCovidDataset),
     headers: {
       "cache-control": "public, s-maxage=3600"
     }

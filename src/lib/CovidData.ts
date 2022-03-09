@@ -17,9 +17,7 @@ export class CovidData {
   }
 
   private getValue(dataObj, key) {
-    const defaultDateKey = Object.keys(dataObj.data)[0];
-
-    return dataObj[key][defaultDateKey];
+    return dataObj[key];
   }
 
   get cases(): number {

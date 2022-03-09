@@ -7,7 +7,7 @@
     <a href="/">
       <h1 class="text-3xl ">Ponto situação COVID em Portugal</h1>
 
-      <p>Dados retirados da <a class="underline" href="https://covid19-api.vost.pt/">VOST</a></p>
+      <p>Dados retirados da <a class="underline" href="https://github.com/dssg-pt/covid19pt-data">DSSG-PT</a></p>
     </a>
   </nav>
 
